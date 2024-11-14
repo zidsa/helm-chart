@@ -102,7 +102,7 @@ grpc:
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe:
     tcpSocket:
-      port: {{ .Values.grpcService.port }}
+      port: 50051
     initialDelaySeconds: 5
     periodSeconds: 10
     successThreshold: 1
@@ -117,7 +117,7 @@ grpc:
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   readinessProbe: 
     exec:
-      command: [ "/bin/grpc_health_probe", "-addr=:{{ .Values.grpcService.port }}" ]
+      command: [ "/bin/grpc_health_probe", "-addr=:50051" ]
     initialDelaySeconds: 3
     timeoutSeconds: 10
     failureThreshold: 5
