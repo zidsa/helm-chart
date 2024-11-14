@@ -31,7 +31,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.http.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.grpc.podSecurityContext | nindent 8 }}
+      {{- if .Values.grpc.initContainers }}
       initContainers:
         {{- toYaml .Values.grpc.initContainers | nindent 6}}
       {{- end }}
