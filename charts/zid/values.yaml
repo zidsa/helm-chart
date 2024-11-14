@@ -100,7 +100,7 @@ grpc:
   startupProbe: {}
   # The kubelet uses readiness probes to know when a container is ready to start accepting traffic.
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  readinessProbe: 
+  readinessProbe:
     exec:
       command: ["/bin/grpc_health_probe", "-addr=:50051"]
     initialDelaySeconds: 3

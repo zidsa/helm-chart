@@ -27,6 +27,8 @@ A Helm chart for Kubernetes
 | grpc.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | grpc.create | bool | `false` |  |
 | grpc.deploymentLabels | object | `{}` |  |
+| grpc.limits.cpu | string | `"100m"` |  |
+| grpc.limits.memory | string | `"128Mi"` |  |
 | grpc.livenessProbe.failureThreshold | int | `4` |  |
 | grpc.livenessProbe.initialDelaySeconds | int | `5` |  |
 | grpc.livenessProbe.periodSeconds | int | `10` |  |
@@ -42,10 +44,9 @@ A Helm chart for Kubernetes
 | grpc.readinessProbe.successThreshold | int | `1` |  |
 | grpc.readinessProbe.timeoutSeconds | int | `10` |  |
 | grpc.replicaCount | int | `1` |  |
-| grpc.resources.limits.cpu | string | `"100m"` |  |
-| grpc.resources.limits.memory | string | `"128Mi"` |  |
-| grpc.resources.requests.cpu | string | `"100m"` |  |
-| grpc.resources.requests.memory | string | `"128Mi"` |  |
+| grpc.requests.cpu | string | `"100m"` |  |
+| grpc.requests.memory | string | `"128Mi"` |  |
+| grpc.resources | string | `nil` |  |
 | grpc.rollingStrategy | string | `"RollingUpdate"` | Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | grpc.startupProbe | object | `{}` |  |
 | grpc.tolerations | list | `[]` |  |
@@ -58,15 +59,16 @@ A Helm chart for Kubernetes
 | http.autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | http.create | bool | `true` |  |
 | http.deploymentLabels | object | `{}` |  |
+| http.limits.cpu | string | `"100m"` |  |
+| http.limits.memory | string | `"128Mi"` |  |
 | http.livenessProbe | object | `{}` |  |
 | http.nodeSelector | object | `{}` |  |
 | http.podLabels | object | `{}` |  |
 | http.readinessProbe | object | `{}` |  |
 | http.replicaCount | int | `1` |  |
-| http.resources.limits.cpu | string | `"100m"` |  |
-| http.resources.limits.memory | string | `"128Mi"` |  |
-| http.resources.requests.cpu | string | `"100m"` |  |
-| http.resources.requests.memory | string | `"128Mi"` |  |
+| http.requests.cpu | string | `"100m"` |  |
+| http.requests.memory | string | `"128Mi"` |  |
+| http.resources | string | `nil` |  |
 | http.rollingStrategy | string | `"RollingUpdate"` | Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
 | http.startupProbe | object | `{}` |  |
 | http.tolerations | list | `[]` |  |
