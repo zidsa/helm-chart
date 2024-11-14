@@ -1,9 +1,3 @@
-# Default values for zid.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-
-
 image:
   repository: nginx
   pullPolicy: IfNotPresent
@@ -22,12 +16,9 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-
 podAnnotations: {}
-
 podSecurityContext: {}
   # fsGroup: 2000
-
 securityContext: {}
   # capabilities:
   #   drop:
@@ -35,7 +26,6 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
   # runAsUser: 1000
-
 dnsConfig:
   enabled: false
   dnsConfig:
@@ -53,7 +43,6 @@ dnsConfig:
         - svc.cluster.local
         - cluster.local
         - eu-west-1.compute.internal
-
 service:
   type: ClusterIP
   port: 80
@@ -77,7 +66,6 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
-
 grpc:
   create: false
   replicaCount: 1
@@ -86,12 +74,12 @@ grpc:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-   limits:
-     cpu: 100m
-     memory: 128Mi
-   requests:
-     cpu: 100m
-     memory: 128Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -102,41 +90,31 @@ grpc:
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe:
     tcpSocket:
-      port: {{ .Values.grpcService.port }}
+      port: 50051
     initialDelaySeconds: 5
     periodSeconds: 10
     successThreshold: 1
     failureThreshold: 4
-
-
   # The kubelet uses startup probe to indicates whether the application within the container is started
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#when-should-you-use-a-startup-probe
   startupProbe: {}
-
   # The kubelet uses readiness probes to know when a container is ready to start accepting traffic.
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  readinessProbe: 
+  readinessProbe:
     exec:
-      command: [ "/bin/grpc_health_probe", "-addr=:{{ .Values.grpcService.port }}" ]
+      command: ["/bin/grpc_health_probe", "-addr=:50051"]
     initialDelaySeconds: 3
     timeoutSeconds: 10
     failureThreshold: 5
     successThreshold: 1
     periodSeconds: 10
-
   deploymentLabels: {}
-
   podLabels: {}
-
   nodeSelector: {}
-
   tolerations: []
-
   affinity: {}
-
 # -- Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   rollingStrategy: RollingUpdate
-
 http:
   replicaCount: 1
   create: true
@@ -145,40 +123,31 @@ http:
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
   # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-   limits:
-     cpu: 100m
-     memory: 128Mi
-   requests:
-     cpu: 100m
-     memory: 128Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
   autoscaling:
     enabled: false
     minReplicas: 1
     maxReplicas: 100
     targetCPUUtilizationPercentage: 80
     # targetMemoryUtilizationPercentage: 80
-  
   # The kubelet uses liveness probes to know when to restart a container.
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   livenessProbe: {}
-
   # The kubelet uses startup probe to indicates whether the application within the container is started
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#when-should-you-use-a-startup-probe
   startupProbe: {}
-
   # The kubelet uses readiness probes to know when a container is ready to start accepting traffic.
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   readinessProbe: {}
-
   deploymentLabels: {}
-
   podLabels: {}
-
   nodeSelector: {}
-
   tolerations: []
-
   affinity: {}
-
 # -- Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   rollingStrategy: RollingUpdate
