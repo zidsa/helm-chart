@@ -4,6 +4,18 @@
 
 A Helm chart for Kubernetes
 
+**Homepage:** <https://github.com/zidsa/helm-chart>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| DevOps | <devops@zid.sa> |  |
+
+## Source Code
+
+* <https://github.com/zidsa/helm-chart>
+
 ## Values
 
 | Key | Type | Default | Description |
