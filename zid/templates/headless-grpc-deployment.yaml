@@ -1,0 +1,78 @@
+{{- if .Values.grpc.create -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zid.fullname" . }}-headless-grpc
+  labels:
+    {{- include "zid.labels" . | nindent 4 }}
+    {{- with .Values.grpc.deploymentLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "zid.selectorLabels" . | nindent 6 }}
+      type: "headless-grpc"
+  {{- if not .Values.grpc.autoscaling.enabled }}
+  replicas: {{ .Values.grpc.replicaCount }}
+  {{- end }}
+  template:
+    metadata:
+      labels:
+        {{- include "zid.selectorLabels" . | nindent 8 }}
+        {{- with .Values.grpc.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        revision: {{ .Release.Revision | quote }}
+        type: "headless-grpc"
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.http.podSecurityContext | nindent 8 }}
+      initContainers:
+        {{- toYaml .Values.grpc.initContainers | nindent 6}}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          envFrom:
+            - secretRef:
+                name: {{ include "zid.fullname" . }}-secret
+          securityContext:
+            {{- toYaml .Values.grpc.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["rr", "serve", "-p", "-w", "/var/www", "-c", ".rr.yaml"]
+          ports:
+            - name: headless-grpc
+              containerPort: {{ .Values.grpcService.port }}
+              protocol: TCP
+          livenessProbe:
+          {{- with .Values.grpc.livenessProbe }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+          {{- with .Values.grpc.readinessProbe }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","rr stop; sleep 6;"]
+          resources:
+            {{- toYaml .Values.grpc.resources | nindent 12 }}
+      {{- with .Values.grpc.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.grpc.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.grpc.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

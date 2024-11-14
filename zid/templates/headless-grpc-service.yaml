@@ -1,0 +1,18 @@
+{{- if .Values.grpc.create -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "zid.fullname" . }}-headless-grpc
+  labels:
+    {{- include "zid.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.grpcService.type }}
+  clusterIP: None
+  ports:
+    - port: {{ .Values.grpcService.port }}
+      targetPort: headless-grpc
+      protocol: TCP
+      name: headless-grpc
+  selector:
+    {{- include "zid.selectorLabels" . | nindent 4 }}
+{{- end }}

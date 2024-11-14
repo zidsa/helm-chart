@@ -1,0 +1,82 @@
+{{- if .Values.http.create -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "zid.fullname" . }}
+  labels:
+    {{- include "zid.labels" . | nindent 4 }}
+    {{- with .Values.http.deploymentLabels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if not .Values.http.autoscaling.enabled }}
+  replicas: {{ .Values.http.replicaCount }}
+  {{- end }}
+  strategy:
+  {{- if .Values.http.rollingStrategy}}
+    type: {{ .Values.http.rollingStrategy}}
+  {{- else }}
+    type: RollingUpdate
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "zid.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.http.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "zid.selectorLabels" . | nindent 8 }}
+        {{- with .Values.http.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "zid.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.http.podSecurityContext | nindent 8 }}
+      {{- if .Values.http.initContainers }}
+      initContainers:
+        {{- toYaml .Values.http.initContainers | nindent 6}}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.http.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          livenessProbe:
+          {{- with .Values.http.livenessProbe }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          readinessProbe:
+          {{- with .Values.http.readinessProbe }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.http.resources | nindent 12 }}
+      {{- if .Values.http.sidecars }}
+        {{- toYaml .Values.http.sidecars | nindent 6}}
+      {{- end }}
+      {{- with .Values.http.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.http.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.http.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
