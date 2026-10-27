@@ -33,8 +33,4 @@ version-resolver:
       - 'dependencies'
       - 'security'
       - 'maintenance'
-<<<<<<< HEAD
       - 'documentation'
-=======
-      - 'documentation'
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)

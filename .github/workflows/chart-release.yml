@@ -1,7 +1,5 @@
 name: Chart Release
 
-<<<<<<< HEAD
-=======
 # Publishes charts/zid.
 #
 # Two stores, one site:
@@ -12,33 +10,10 @@ name: Chart Release
 #      every pinned chart version stays downloadable. Setting the repository's
 #      Pages source to "GitHub Actions" is required (Settings -> Pages ->
 #      Source: GitHub Actions); a GITHUB_TOKEN push does not trigger a build.
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
 on:
   push:
     branches: [ main ]
     paths:
-<<<<<<< HEAD
-    - 'zid/**'
-    - 'scripts/helm-release-chart.sh'
-    - '.github/workflows/chart-release.yml'
-
-jobs:
-  release:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: "0"
-
-      - name: Configure Git
-        run: |
-          git config user.name "$GITHUB_ACTOR"
-          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-      - name: Release chart
-        shell: bash
-        run: bash scripts/helm-release-chart.sh
-=======
       - 'charts/zid/**'
       - 'scripts/**'
       - '.github/workflows/chart-release.yml'
@@ -161,4 +136,3 @@ jobs:
           done
           echo "::error::${HELM_REPO_URL} did not serve version ${chart_version} within the timeout"
           exit 1
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)

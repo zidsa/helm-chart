@@ -1,44 +1,24 @@
-<<<<<<< HEAD
-{{- if .Values.http.create -}}
-=======
 {{- if .Values.http.create }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "zid.fullname" . }}
   labels:
     {{- include "zid.labels" . | nindent 4 }}
-<<<<<<< HEAD
-    {{- with .Values.http.deploymentLabels }}
-      {{- toYaml . | nindent 4 }}
-=======
     app.kubernetes.io/component: http
     {{- with .Values.http.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
     {{- end }}
 spec:
   {{- if not .Values.http.autoscaling.enabled }}
   replicas: {{ .Values.http.replicaCount }}
   {{- end }}
   strategy:
-<<<<<<< HEAD
-  {{- if .Values.http.rollingStrategy}}
-    type: {{ .Values.http.rollingStrategy}}
-  {{- else }}
-    type: RollingUpdate
-  {{- end }}
-  selector:
-    matchLabels:
-      {{- include "zid.selectorLabels" . | nindent 6 }}
-=======
     type: {{ .Values.http.rollingStrategy | default "RollingUpdate" }}
   selector:
     matchLabels:
       {{- include "zid.selectorLabels" . | nindent 6 }}
       app.kubernetes.io/component: http
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
   template:
     metadata:
       {{- with .Values.http.podAnnotations }}
@@ -47,14 +27,9 @@ spec:
       {{- end }}
       labels:
         {{- include "zid.selectorLabels" . | nindent 8 }}
-<<<<<<< HEAD
-        {{- with .Values.http.podLabels }}
-          {{- toYaml . | nindent 8 }}
-=======
         app.kubernetes.io/component: http
         {{- with .Values.http.podLabels }}
         {{- toYaml . | nindent 8 }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
         {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
@@ -62,18 +37,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "zid.serviceAccountName" . }}
-<<<<<<< HEAD
-      securityContext:
-        {{- toYaml .Values.http.podSecurityContext | nindent 8 }}
-      {{- if .Values.http.initContainers }}
-      initContainers:
-        {{- toYaml .Values.http.initContainers | nindent 6}}
-      {{- end }}
-      containers:
-        - name: {{ .Chart.Name }}
-          securityContext:
-            {{- toYaml .Values.http.securityContext | nindent 12 }}
-=======
       {{- with .Values.http.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -104,28 +67,12 @@ spec:
           securityContext:
             {{- toYaml . | nindent 12 }}
           {{- end }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-<<<<<<< HEAD
-          livenessProbe:
-          {{- with .Values.http.livenessProbe }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          readinessProbe:
-          {{- with .Values.http.readinessProbe }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          resources:
-            {{- toYaml .Values.http.resources | nindent 12 }}
-      {{- if .Values.http.sidecars }}
-        {{- toYaml .Values.http.sidecars | nindent 6}}
-      {{- end }}
-=======
           {{- with .Values.http.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -141,7 +88,6 @@ spec:
         {{- with .Values.http.sidecars }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
       {{- with .Values.http.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -154,8 +100,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-<<<<<<< HEAD
 {{- end }}
-=======
-{{- end }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)

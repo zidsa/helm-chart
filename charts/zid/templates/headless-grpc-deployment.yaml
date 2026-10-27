@@ -1,32 +1,19 @@
-<<<<<<< HEAD
-{{- if .Values.grpc.create -}}
-=======
 {{- if .Values.grpc.create }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "zid.fullname" . }}-headless-grpc
   labels:
     {{- include "zid.labels" . | nindent 4 }}
-<<<<<<< HEAD
-    {{- with .Values.grpc.deploymentLabels }}
-      {{- toYaml . | nindent 4 }}
-=======
     app.kubernetes.io/component: grpc
     {{- with .Values.grpc.deploymentLabels }}
     {{- toYaml . | nindent 4 }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
     {{- end }}
 spec:
   selector:
     matchLabels:
       {{- include "zid.selectorLabels" . | nindent 6 }}
-<<<<<<< HEAD
-      type: "headless-grpc"
-=======
       app.kubernetes.io/component: grpc
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
   {{- if not .Values.grpc.autoscaling.enabled }}
   replicas: {{ .Values.grpc.replicaCount }}
   {{- end }}
@@ -34,42 +21,16 @@ spec:
     metadata:
       labels:
         {{- include "zid.selectorLabels" . | nindent 8 }}
-<<<<<<< HEAD
-        {{- with .Values.grpc.podLabels }}
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
-        revision: {{ .Release.Revision | quote }}
-        type: "headless-grpc"
-=======
         app.kubernetes.io/component: grpc
         {{- with .Values.grpc.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
         revision: {{ .Release.Revision | quote }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-<<<<<<< HEAD
-      securityContext:
-        {{- toYaml .Values.grpc.podSecurityContext | nindent 8 }}
-      {{- if .Values.grpc.initContainers }}
-      initContainers:
-        {{- toYaml .Values.grpc.initContainers | nindent 6}}
-      {{- end }}
-      containers:
-        - name: {{ .Chart.Name }}
-          envFrom:
-            - secretRef:
-                name: {{ include "zid.fullname" . }}-secret
-          securityContext:
-            {{- toYaml .Values.grpc.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["rr", "serve", "-p", "-w", "/var/www", "-c", ".rr.yaml"]
-=======
       {{- with .Values.grpc.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -111,27 +72,10 @@ spec:
           command:
             {{- toYaml . | nindent 12 }}
           {{- end }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
           ports:
             - name: headless-grpc
               containerPort: {{ .Values.grpcService.port }}
               protocol: TCP
-<<<<<<< HEAD
-          livenessProbe:
-          {{- with .Values.grpc.livenessProbe }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          readinessProbe:
-          {{- with .Values.grpc.readinessProbe }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          lifecycle:
-            preStop:
-              exec:
-                command: ["/bin/sh","-c","rr stop; sleep 6;"]
-          resources:
-            {{- toYaml .Values.grpc.resources | nindent 12 }}
-=======
           {{- with .Values.grpc.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
@@ -151,7 +95,6 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
       {{- with .Values.grpc.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -164,8 +107,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-<<<<<<< HEAD
 {{- end }}
-=======
-{{- end }}
->>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
