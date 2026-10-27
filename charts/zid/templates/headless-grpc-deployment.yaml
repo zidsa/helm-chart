@@ -1,18 +1,32 @@
+<<<<<<< HEAD
 {{- if .Values.grpc.create -}}
+=======
+{{- if .Values.grpc.create }}
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "zid.fullname" . }}-headless-grpc
   labels:
     {{- include "zid.labels" . | nindent 4 }}
+<<<<<<< HEAD
     {{- with .Values.grpc.deploymentLabels }}
       {{- toYaml . | nindent 4 }}
+=======
+    app.kubernetes.io/component: grpc
+    {{- with .Values.grpc.deploymentLabels }}
+    {{- toYaml . | nindent 4 }}
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
     {{- end }}
 spec:
   selector:
     matchLabels:
       {{- include "zid.selectorLabels" . | nindent 6 }}
+<<<<<<< HEAD
       type: "headless-grpc"
+=======
+      app.kubernetes.io/component: grpc
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
   {{- if not .Values.grpc.autoscaling.enabled }}
   replicas: {{ .Values.grpc.replicaCount }}
   {{- end }}
@@ -20,16 +34,25 @@ spec:
     metadata:
       labels:
         {{- include "zid.selectorLabels" . | nindent 8 }}
+<<<<<<< HEAD
         {{- with .Values.grpc.podLabels }}
           {{- toYaml . | nindent 8 }}
         {{- end }}
         revision: {{ .Release.Revision | quote }}
         type: "headless-grpc"
+=======
+        app.kubernetes.io/component: grpc
+        {{- with .Values.grpc.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        revision: {{ .Release.Revision | quote }}
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+<<<<<<< HEAD
       securityContext:
         {{- toYaml .Values.grpc.podSecurityContext | nindent 8 }}
       {{- if .Values.grpc.initContainers }}
@@ -46,10 +69,54 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["rr", "serve", "-p", "-w", "/var/www", "-c", ".rr.yaml"]
+=======
+      {{- with .Values.grpc.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.dnsConfig.enabled }}
+      dnsPolicy: {{ .Values.dnsConfig.policy | default "None" }}
+      dnsConfig:
+        {{- with .Values.dnsConfig.nameservers }}
+        nameservers:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.dnsConfig.options }}
+        options:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with .Values.dnsConfig.searches }}
+        searches:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.grpc.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.grpc.secretName }}
+          envFrom:
+            - secretRef:
+                name: {{ . | quote }}
+          {{- end }}
+          {{- with .Values.grpc.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.grpc.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
           ports:
             - name: headless-grpc
               containerPort: {{ .Values.grpcService.port }}
               protocol: TCP
+<<<<<<< HEAD
           livenessProbe:
           {{- with .Values.grpc.livenessProbe }}
             {{- toYaml . | nindent 12 }}
@@ -64,6 +131,27 @@ spec:
                 command: ["/bin/sh","-c","rr stop; sleep 6;"]
           resources:
             {{- toYaml .Values.grpc.resources | nindent 12 }}
+=======
+          {{- with .Values.grpc.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.grpc.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.grpc.preStopCommand }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  {{- toYaml . | nindent 18 }}
+          {{- end }}
+          {{- with .Values.grpc.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
       {{- with .Values.grpc.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -76,4 +164,8 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+<<<<<<< HEAD
 {{- end }}
+=======
+{{- end }}
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)

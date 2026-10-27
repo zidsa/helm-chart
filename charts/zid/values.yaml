@@ -1,8 +1,20 @@
+# Default values for the `zid` chart.
+#
+# Security defaults are non-root: the chart ships no privileged settings and
+# every container securityContext drops ALL capabilities. Per-workload overrides
+# live under http./grpc./worker. (the old top-level securityContext and
+# podSecurityContext keys were ignored by the templates and have been removed).
+
 image:
-  repository: nginx
+  # Non-root default image: listens on 8080 as UID 101, so the chart's default
+  # security defaults can be enforced. Override per service (for example the
+  # zidpay ECR image) in the env values repo.
+  repository: nginxinc/nginx-unprivileged
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  # Pinned default tag. The chart renders repository:tag and falls back to the
+  # chart appVersion only when tag is empty; keep this set to a real tag of the
+  # default image so the default render / CI install pulls a valid image.
+  tag: "1.27"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -16,36 +28,33 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
-podAnnotations: {}
-podSecurityContext: {}
-  # fsGroup: 2000
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+
+# DNS configuration, applied to the http, grpc and worker pods.
+# `policy` is rendered as Pod.spec.dnsPolicy; nameservers/options/searches are
+# rendered under Pod.spec.dnsConfig. Only enable this if the cluster really
+# provides the nameserver below (e.g. NodeLocal DNSCache); a wrong nameserver
+# makes every pod unable to resolve anything.
 dnsConfig:
   enabled: false
-  dnsConfig:
-    dnsPolicy: "None"
-    dnsConfig:
-      nameservers:
-        - 169.254.20.10
-      options:
-        - name: attempts
-          value: "3"
-        - name: ndots
-          value: "5"
-      searches:
-        - prod.svc.cluster.local
-        - svc.cluster.local
-        - cluster.local
-        - eu-west-1.compute.internal
+  policy: "None"
+  nameservers:
+    - 169.254.20.10
+  options:
+    - name: attempts
+      value: "3"
+    - name: ndots
+      value: "5"
+  searches:
+    - prod.svc.cluster.local
+    - svc.cluster.local
+    - cluster.local
+    - eu-west-1.compute.internal
+
 service:
   type: ClusterIP
-  port: 80
+  # Port the container listens on. nginxinc/nginx-unprivileged listens on 8080;
+  # set this to the real listening port of the image you deploy.
+  port: 8080
 
 grpcService:
   type: ClusterIP
@@ -66,20 +75,46 @@ ingress:
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
+
 grpc:
   create: false
   replicaCount: 1
   resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  limits:
-    cpu: 100m
-    memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1
+      memory: 512Mi
+  # Container command. Empty list = use the image entrypoint. The defaults below
+  # are the RoadRunner worker command this chart was originally written for.
+  command:
+    - rr
+    - serve
+    - -p
+    - -w
+    - /var/www
+    - -c
+    - .rr.yaml
+  # preStop hook command. Empty list = no lifecycle hook.
+  preStopCommand:
+    - /bin/sh
+    - -c
+    - rr stop; sleep 6;
+  # Name of an existing Secret to load as env vars. Empty = no envFrom block.
+  # The chart used to hardcode "<fullname>-secret"; set it explicitly when the
+  # release really has that secret.
+  secretName: ""
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -110,25 +145,37 @@ grpc:
     periodSeconds: 10
   deploymentLabels: {}
   podLabels: {}
+  initContainers: []
   nodeSelector: {}
   tolerations: []
   affinity: {}
 # -- Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   rollingStrategy: RollingUpdate
+
 http:
   replicaCount: 1
   create: true
   resources:
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  limits:
-    cpu: 100m
-    memory: 128Mi
-  requests:
-    cpu: 100m
-    memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 1
+      memory: 512Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+    # nginxinc/nginx-unprivileged writes its cache and pid under /tmp, so the
+    # root filesystem stays writable. Set true and mount emptyDirs for /tmp and
+    # /var/cache/nginx when the image tolerates a read-only root filesystem.
+    readOnlyRootFilesystem: false
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -144,6 +191,11 @@ http:
   # The kubelet uses readiness probes to know when a container is ready to start accepting traffic.
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   readinessProbe: {}
+  podAnnotations: {}
+  # Optional extra containers / init containers. sidecars render at the same
+  # indentation as the main container (8 spaces, two under "containers:").
+  initContainers: []
+  sidecars: []
   deploymentLabels: {}
   podLabels: {}
   nodeSelector: {}
@@ -151,3 +203,40 @@ http:
   affinity: {}
 # -- Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   rollingStrategy: RollingUpdate
+
+# Workers are opt-in: an empty list renders no worker Deployments.
+# Each entry needs at least a name; command is rendered with toYaml, so write it
+# as a list. Optional per-worker keys: replicaCount, command, preStopCommand,
+# secretName, resources, nodeSelector.
+workers: []
+# - name: queue
+#   replicaCount: 1
+#   command:
+#     - php
+#     - artisan
+#     - queue:work
+#   resources:
+#     requests:
+#       cpu: 100m
+#       memory: 128Mi
+#     limits:
+#       cpu: 1
+#       memory: 512Mi
+
+worker:
+  # Shared worker defaults. secretName is optional: when it is empty (and the
+  # worker entry sets no secretName) no envFrom/secretRef is rendered.
+  secretName: ""
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    runAsNonRoot: true
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}

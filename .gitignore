@@ -1,0 +1,5 @@
+# Helm / release working directories and packaged archives.
+# Packaged .tgz files live in the gh-pages archive branch, never on main.
+.charts/
+*.tgz
+.DS_Store

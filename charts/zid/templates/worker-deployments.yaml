@@ -3,14 +3,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "zid.fullname"  $ }}-{{ $worker.name }}
+  name: {{ include "zid.fullname" $ }}-{{ $worker.name }}
   labels:
     {{- include "zid.labels" $ | nindent 4 }}
-    {{- with .Values.http.deploymentLabels }}
-      {{- toYaml . | nindent 4 }}
+    app.kubernetes.io/component: {{ $worker.name }}
+    {{- with $.Values.http.deploymentLabels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
 spec:
-  replicas: {{ $worker.replicaCount }}
+  replicas: {{ $worker.replicaCount | default 1 }}
   selector:
     matchLabels:
       {{- include "zid.selectorLabels" $ | nindent 6 }}
@@ -19,53 +20,79 @@ spec:
     metadata:
       labels:
         {{- include "zid.selectorLabels" $ | nindent 8 }}
-        {{- with .Values.http.podLabels }}
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
         app.kubernetes.io/component: {{ $worker.name }}
+        {{- with $.Values.http.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         revision: {{ $.Release.Revision | quote }}
       annotations:
-        always-update: {{ randAlphaNum 5 | quote }}
+        # Deterministic: changes only when this worker's values change, so the
+        # pod template rolls on a real config change and is stable otherwise.
+        checksum/worker-config: {{ toYaml $worker | sha256sum }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with $.Values.worker.podSecurityContext }}
       securityContext:
-        {{- toYaml $.Values.worker.podSecurityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if $.Values.dnsConfig.enabled }}
+      dnsPolicy: {{ $.Values.dnsConfig.policy | default "None" }}
       dnsConfig:
-        {{- toYaml $.Values.dnsConfig.dnsConfig | nindent 8 }}
+        {{- with $.Values.dnsConfig.nameservers }}
+        nameservers:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $.Values.dnsConfig.options }}
+        options:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- with $.Values.dnsConfig.searches }}
+        searches:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
       {{- end }}
       containers:
         - name: {{ $.Chart.Name }}
+          {{- $secretName := $worker.secretName | default $.Values.worker.secretName }}
+          {{- with $secretName }}
           envFrom:
             - secretRef:
-                name: zid-secrets
+                name: {{ . | quote }}
+          {{- end }}
+          {{- with $.Values.worker.securityContext }}
           securityContext:
-            {{- toYaml $.Values.worker.securityContext | nindent 12 }}
-          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag | default $.Chart.AppVersion }}"
           imagePullPolicy: {{ $.Values.image.pullPolicy }}
-          command: {{ $worker.command }}
+          {{- with $worker.command }}
+          command:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $worker.preStopCommand }}
           lifecycle:
             preStop:
               exec:
                 command:
-                  - sh
-                  - -c
-                  - "sleep 5"
+                  {{- toYaml . | nindent 18 }}
+          {{- end }}
+          {{- with $worker.resources }}
           resources:
-            {{- toYaml $worker.resources | nindent 12 }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       {{- with $worker.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-    {{- with $.Values.worker.affinity }}
+      {{- with $.Values.worker.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with $.Values.worker.tolerations }}
+      {{- end }}
+      {{- with $.Values.worker.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
-    {{- end }}
+      {{- end }}
 {{- end }}

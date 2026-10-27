@@ -1,1 +1,11 @@
+<<<<<<< HEAD
 zid/devops
+=======
+# Default platform ownership.
+* @zidsa/devops
+
+# Chart and release controls are platform-owned.
+/charts/ @zidsa/devops
+/scripts/ @zidsa/devops
+/.github/ @zidsa/devops
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)

@@ -1,9 +1,23 @@
 name: Chart Release
 
+<<<<<<< HEAD
+=======
+# Publishes charts/zid.
+#
+# Two stores, one site:
+#   1. the `gh-pages` branch keeps every published .tgz plus a regenerated
+#      index.yaml, additively (nothing is ever deleted there);
+#   2. the public site at https://zidsa.github.io/helm-chart is deployed from a
+#      GitHub Actions Pages artifact built from the COMPLETE archive branch, so
+#      every pinned chart version stays downloadable. Setting the repository's
+#      Pages source to "GitHub Actions" is required (Settings -> Pages ->
+#      Source: GitHub Actions); a GITHUB_TOKEN push does not trigger a build.
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
 on:
   push:
     branches: [ main ]
     paths:
+<<<<<<< HEAD
     - 'zid/**'
     - 'scripts/helm-release-chart.sh'
     - '.github/workflows/chart-release.yml'
@@ -24,3 +38,127 @@ jobs:
       - name: Release chart
         shell: bash
         run: bash scripts/helm-release-chart.sh
+=======
+      - 'charts/zid/**'
+      - 'scripts/**'
+      - '.github/workflows/chart-release.yml'
+
+concurrency:
+  group: chart-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Package and record the archive
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write   # append the new package + index.yaml to the archive branch
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: v3.16.3
+
+      - name: Package the chart and update the archive branch
+        shell: bash
+        run: bash scripts/helm-release-chart.sh
+
+      - name: Build the Pages site from the complete archive branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          git fetch --quiet --no-tags origin gh-pages
+          git archive origin/gh-pages | tar -x -C _site
+          test -f _site/index.yaml || { echo "::error::index.yaml missing on gh-pages"; exit 1; }
+          # The Pages artifact replaces the whole site, so every version listed in
+          # index.yaml must have its archive in the artifact - otherwise older
+          # pinned versions break.
+          missing=0
+          while read -r url; do
+            [ -n "$url" ] || continue
+            file="${url##*/}"
+            if [ ! -f "_site/${file}" ]; then
+              echo "::error::index.yaml references ${file} but it is not in the artifact"
+              missing=1
+            fi
+          done < <(grep -oE '[^ "[:space:]]+\.tgz' _site/index.yaml | sort -u)
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          touch _site/.nojekyll
+          echo "Artifact contains $(ls -1 _site/*.tgz | wc -l) chart archive(s):"
+          ls -1 _site/*.tgz
+
+      - name: Upload the Pages artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: helm-chart-site
+          path: _site
+          retention-days: 1
+
+  deploy:
+    name: Deploy the chart repository to Pages
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write      # deploy to GitHub Pages
+      id-token: write   # OIDC token for the Pages deployment
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download the Pages artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: helm-chart-site
+          path: _site
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload the Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  verify:
+    name: Verify the published index anonymously
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Poll the public index until the new version resolves
+        shell: bash
+        env:
+          HELM_REPO_URL: https://zidsa.github.io/helm-chart
+        run: |
+          set -euo pipefail
+          chart_version="$(grep -E '^version:' charts/zid/Chart.yaml | awk '{print $2}' | head -n1)"
+          [ -n "${chart_version}" ] || { echo "::error::could not read the chart version"; exit 1; }
+          for attempt in $(seq 1 20); do
+            if curl -fsSL "${HELM_REPO_URL}/index.yaml" -o index.yaml; then
+              if grep -Eq "^[[:space:]]+version:[[:space:]]*[\"']?${chart_version}[\"']?[[:space:]]*$" index.yaml; then
+                if curl -fsSL -o /dev/null "${HELM_REPO_URL}/zid-${chart_version}.tgz"; then
+                  echo "index.yaml and zid-${chart_version}.tgz resolve anonymously"
+                  exit 0
+                fi
+              fi
+            fi
+            echo "attempt ${attempt}: not published yet, waiting for Pages"
+            sleep 15
+          done
+          echo "::error::${HELM_REPO_URL} did not serve version ${chart_version} within the timeout"
+          exit 1
+>>>>>>> f3a64c9 (zid chart v0.2.0: central chart with hardened defaults + Actions-Pages release)
