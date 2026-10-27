@@ -35,9 +35,8 @@ if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
   fail "git working tree is not clean, aborting"
 fi
 
-CHART_META="$(helm show chart "${CHART_DIR}")"
-CHART_NAME="$(printf '%s\n' "${CHART_META}" | awk '$1=="name:"{print $2; exit}')"
-CHART_VERSION="$(printf '%s\n' "${CHART_META}" | awk '$1=="version:"{print $2; exit}')"
+CHART_NAME="$(awk '/^name:/{print $2; exit}' "${CHART_DIR}/Chart.yaml")"
+CHART_VERSION="$(awk '/^version:/{print $2; exit}' "${CHART_DIR}/Chart.yaml")"
 [ -n "${CHART_NAME}" ] || fail "could not read 'name' from ${CHART_DIR}/Chart.yaml"
 [ -n "${CHART_VERSION}" ] || fail "could not read 'version' from ${CHART_DIR}/Chart.yaml"
 
