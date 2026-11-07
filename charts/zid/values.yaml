@@ -159,6 +159,10 @@ http:
   # Empty = no envFrom block. When set, it must match ExternalSecret.spec.
   # target.name (e.g. zidpay-service-secrets).
   secretName: ""
+  # Plain (non-secret) environment variables, as a list of {name, value} (or
+  # {name, valueFrom}). Sensitive values belong in the Secret via secretName,
+  # not here.
+  env: []
   resources:
     requests:
       cpu: 100m
