@@ -3,7 +3,23 @@ entries:
   zid:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-11-07T13:23:42.097506303Z"
+    created: "2026-11-07T15:54:45.516220221Z"
+    description: A Helm chart for Kubernetes
+    digest: 84b8d61ea2cdfabba72eb4a37a33a283c8f3dd079eff28d08f6512f70d0dba0f
+    home: https://github.com/zidsa/helm-chart
+    maintainers:
+    - email: devops@zid.sa
+      name: DevOps
+    name: zid
+    sources:
+    - https://github.com/zidsa/helm-chart
+    type: application
+    urls:
+    - https://zidsa.github.io/helm-chart/zid-0.3.1.tgz
+    version: 0.3.1
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-11-07T15:54:45.515373071Z"
     description: A Helm chart for Kubernetes
     digest: 3d81a87b5ad469599a339c76fe724db605b0ce09a476ad2ff7508f6af4975a10
     home: https://github.com/zidsa/helm-chart
@@ -19,7 +35,7 @@ entries:
     version: 0.3.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-11-07T13:23:42.096655158Z"
+    created: "2026-11-07T15:54:45.514454888Z"
     description: A Helm chart for Kubernetes
     digest: eb3ad077fba7ea7405ad1786f5f1927709751c5d0b4e5295639dd34cc78eebf7
     home: https://github.com/zidsa/helm-chart
@@ -33,4 +49,4 @@ entries:
     urls:
     - https://zidsa.github.io/helm-chart/zid-0.2.0.tgz
     version: 0.2.0
-generated: "2026-11-07T13:23:42.095660854Z"
+generated: "2026-11-07T15:54:45.513422062Z"
