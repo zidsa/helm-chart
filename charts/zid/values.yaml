@@ -62,10 +62,17 @@ grpcService:
 
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  className: alb
+  # Shared-ALB defaults: every service that sets ingress.enabled inherits the
+  # same internet-facing ALB per environment (group.name), so all services ride
+  # ONE ALB instead of one each. Override per-environment (production) if needed.
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: testing
+    alb.ingress.kubernetes.io/load-balancer-name: zid-platform-testing
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:736954620450:certificate/bcc2feca-29ac-4f0c-bfc2-26e03596a95b
   hosts:
     - host: chart-example.local
       paths:
