@@ -155,6 +155,10 @@ grpc:
 http:
   replicaCount: 1
   create: true
+  # Name of an existing Secret to load as env vars into the http container.
+  # Empty = no envFrom block. When set, it must match ExternalSecret.spec.
+  # target.name (e.g. zidpay-service-secrets).
+  secretName: ""
   resources:
     requests:
       cpu: 100m

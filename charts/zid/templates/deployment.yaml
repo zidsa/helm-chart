@@ -63,6 +63,11 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
+          {{- with .Values.http.secretName }}
+          envFrom:
+            - secretRef:
+                name: {{ . | quote }}
+          {{- end }}
           {{- with .Values.http.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
