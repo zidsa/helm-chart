@@ -68,6 +68,10 @@ spec:
             - secretRef:
                 name: {{ . | quote }}
           {{- end }}
+          {{- with .Values.http.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- with .Values.http.securityContext }}
           securityContext:
             {{- toYaml . | nindent 12 }}
