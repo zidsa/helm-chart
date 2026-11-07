@@ -101,6 +101,7 @@ A Helm chart for Kubernetes
 | http.resources.requests.cpu | string | `"100m"` |  |
 | http.resources.requests.memory | string | `"128Mi"` |  |
 | http.rollingStrategy | string | `"RollingUpdate"` | Specify deployment rolling strategy: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy |
+| http.secretName | string | `""` | Name of an existing Secret to load as env vars into the http container. Empty = no envFrom block. When set, must match ExternalSecret.spec.target.name. |
 | http.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | http.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | http.securityContext.readOnlyRootFilesystem | bool | `false` |  |
