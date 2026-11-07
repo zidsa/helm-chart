@@ -3,7 +3,23 @@ entries:
   zid:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-11-07T16:59:00.048594451Z"
+    created: "2026-11-07T19:01:10.189544621Z"
+    description: A Helm chart for Kubernetes
+    digest: fae9512d5456f409718f8fa20b5a8f8510f49b63ad88d6ff6153d38ad7bba6fc
+    home: https://github.com/zidsa/helm-chart
+    maintainers:
+    - email: devops@zid.sa
+      name: DevOps
+    name: zid
+    sources:
+    - https://github.com/zidsa/helm-chart
+    type: application
+    urls:
+    - https://zidsa.github.io/helm-chart/zid-0.3.3.tgz
+    version: 0.3.3
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2026-11-07T19:01:10.188382609Z"
     description: A Helm chart for Kubernetes
     digest: ee27d6d9b503a9be7fc7e55e46d8fe6ec2bbf3166815b7eb18a82324e3ffa9b0
     home: https://github.com/zidsa/helm-chart
@@ -19,7 +35,7 @@ entries:
     version: 0.3.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-11-07T16:59:00.047774814Z"
+    created: "2026-11-07T19:01:10.187282669Z"
     description: A Helm chart for Kubernetes
     digest: 84b8d61ea2cdfabba72eb4a37a33a283c8f3dd079eff28d08f6512f70d0dba0f
     home: https://github.com/zidsa/helm-chart
@@ -35,7 +51,7 @@ entries:
     version: 0.3.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-11-07T16:59:00.046952231Z"
+    created: "2026-11-07T19:01:10.186195879Z"
     description: A Helm chart for Kubernetes
     digest: 3d81a87b5ad469599a339c76fe724db605b0ce09a476ad2ff7508f6af4975a10
     home: https://github.com/zidsa/helm-chart
@@ -51,7 +67,7 @@ entries:
     version: 0.3.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2026-11-07T16:59:00.046094703Z"
+    created: "2026-11-07T19:01:10.184958094Z"
     description: A Helm chart for Kubernetes
     digest: eb3ad077fba7ea7405ad1786f5f1927709751c5d0b4e5295639dd34cc78eebf7
     home: https://github.com/zidsa/helm-chart
@@ -65,4 +81,4 @@ entries:
     urls:
     - https://zidsa.github.io/helm-chart/zid-0.2.0.tgz
     version: 0.2.0
-generated: "2026-11-07T16:59:00.045098604Z"
+generated: "2026-11-07T19:01:10.183003215Z"
